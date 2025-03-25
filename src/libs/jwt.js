@@ -2,7 +2,7 @@ import "dotenv/config";
 import jwt from "jsonwebtoken";
 
 function createAccessToken(payload) {
-  new Promise((resolve, rejected) => {
+  return new Promise((resolve, reject) => {
     jwt.sign(
       payload,
       process.env.TOKEN_SECRET,
@@ -11,9 +11,10 @@ function createAccessToken(payload) {
       },
       (err, token) => {
         if (err) {
-          rejected(err);
+          reject(err);
+        } else {
+          resolve(token);
         }
-        resolve(token);
       }
     );
   });

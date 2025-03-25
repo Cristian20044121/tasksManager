@@ -39,7 +39,7 @@ const login = async (req, res) => {
       res.status(400).json({ message: "Invalid credentials" });
     }
 
-    const token = createAccessToken({ id: userFound._id });
+    const token = await createAccessToken({ id: userFound._id });
     res.cookie("token", token);
     res.status(201).json({
       id: userFound._id,
@@ -57,8 +57,20 @@ const logout = async (req, res) => {
   });
   return res.status(200).json({ message: "logout" });
 };
+const profile = async (req, res) => {
+  const userFound = await User.findById(req.user.id);
+  if (!userFound) {
+    return res.status(400).json({ message: "usuario no encontrado" });
+  }
+  return res.json({
+    id: userFound._id,
+    username: userFound.username,
+    email: userFound.email,
+  });
+};
 export default {
   register,
   login,
   logout,
+  profile,
 };
