@@ -1,6 +1,6 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import createAccessToken from "../libs/jwt.js";
 
 const register = async (req, res) => {
   console.log(req.body);
@@ -15,32 +15,15 @@ const register = async (req, res) => {
     });
 
     const userSaved = await newUser.save();
-    jwt.sign(
-      {
-        id: userSaved._id,
-      },
-      "secret123",
-      {
-        expiresIn: "1d",
-      },
-      (err, token) => {
-        if (err) {
-          console.log(err);
-        }
-        res.cookie("token", token);
-        res.json({
-          message: "Usuario creado correctamente",
-        });
-      }
-    );
-
-    // res.status(201).json({
-    //   id: userSaved._id,
-    //   username: userSaved.username,
-    //   email: userSaved.email,
-    // });
+    const token = createAccessToken({ id: userSaved._id });
+    res.cookie("token", token);
+    res.status(201).json({
+      id: userSaved._id,
+      username: userSaved.username,
+      email: userSaved.email,
+    });
   } catch (error) {
-    console.log(`Error al registrar nuevo usuario ${error}`);
+    res.status(500).json({ message: error });
   }
 };
 const login = (req, res) => {
